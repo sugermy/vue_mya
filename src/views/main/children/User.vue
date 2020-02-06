@@ -46,6 +46,7 @@
       <el-table-column label="操作" width="120">
         <template slot-scope="scope">
           <el-button type="text" @click="editAction(scope.row.id)">编辑</el-button>
+          <el-button type="text" @click="pwdAction(scope.row.id)">修改密码</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -59,9 +60,9 @@
     <el-dialog :title="editTxt" :visible.sync="showEdit">
       <el-form :model="form" label-width="80px" ref="editForm" :rules="rules" hide-required-asterisk>
         <el-form-item label="帐号" prop="account">
-          <el-input v-model="form.account" autocomplete="off" placeholder="请输入帐号"></el-input>
+          <el-input v-model="form.account" autocomplete="off" :disabled="!isNew" placeholder="请输入帐号"></el-input>
         </el-form-item>
-        <el-form-item label="密码" prop="pwd">
+        <el-form-item label="密码" prop="pwd" v-if="isNew">
           <el-input v-model="form.pwd" autocomplete="off" placeholder="请输入密码"></el-input>
         </el-form-item>
         <el-form-item label="真实姓名" prop="real_name">
@@ -76,8 +77,8 @@
         </el-form-item>
         <el-form-item label="是否启用">
           <el-radio-group v-model="form.is_enabled">
-            <el-radio :label="true">启用</el-radio>
-            <el-radio :label="false">禁用</el-radio>
+            <el-radio :label="true" :disabled="!isNew">启用</el-radio>
+            <el-radio :label="false" :disabled="!isNew">禁用</el-radio>
           </el-radio-group>
         </el-form-item>
       </el-form>
@@ -120,6 +121,7 @@ export default {
         ]
       },
       form: {
+        id: "",
         account: "",
         pwd: "",
         real_name: "",
@@ -127,7 +129,8 @@ export default {
         remark: "",
         is_enabled: true
       },
-      editTxt: ""
+      editTxt: "",
+      isNew: true
     };
   },
   created() {
@@ -149,14 +152,24 @@ export default {
     newAction() {
       this.editTxt = "新增用户";
       this.showEdit = true;
+      this.isNew = true;
     },
     // 操作
     editAction(id) {
       this.editTxt = "编辑用户";
       this.showEdit = true;
+      this.isNew = false;
       this.$ajax.get(`/api/user/${id}`).then(res => {
         if (res.rsp_code === 200) {
           this.form = res.rsp_data;
+          this.form = {
+            id: res.rsp_data.id,
+            account: res.rsp_data.account,
+            real_name: res.rsp_data.real_name,
+            mobile: res.rsp_data.mobile,
+            remark: res.rsp_data.remark,
+            is_enabled: res.rsp_data.is_enabled
+          };
         } else {
           this.$message({ type: "error", message: res.rsp_msg });
         }
@@ -170,20 +183,26 @@ export default {
         console.log(this.multipleSelection);
       }
     },
+    // 修改密码
+    pwdAction(id) {},
     // 取消提交
     cancalAction(formName) {
       this.$refs[formName].resetFields();
       this.showEdit = false;
+      Object.keys(this.form).forEach(el => {
+        this.form[el] = "";
+      });
+      this.form.is_enabled = true;
     },
     // 确认提交
     confrimAction(formName) {
       console.log(this.form);
       this.$refs[formName].validate(valid => {
         if (valid) {
-          if (this.form.id) {
-            this.editPost();
+          if (this.form.id !== "") {
+            this.editPost(formName);
           } else {
-            this.newPost();
+            this.newPost(formName);
           }
         } else {
           return false;
@@ -191,7 +210,7 @@ export default {
       });
     },
     // 新增提交
-    newPost() {
+    newPost(formName) {
       this.$ajax.post("/api/user/", this.form).then(res => {
         if (res.rsp_code === 200) {
           this.$message({ type: "success", message: res.rsp_msg });
@@ -204,7 +223,7 @@ export default {
       });
     },
     // 编辑提交
-    editPost() {
+    editPost(formName) {
       this.$ajax.put(`/api/user/${this.form.id}`, this.form).then(res => {
         if (res.rsp_code === 200) {
           this.$message({ type: "success", message: res.rsp_msg });

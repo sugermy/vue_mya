@@ -1,5 +1,6 @@
 <template>
   <div class="login" v-loading="loading">
+    <img src="../../assets/logo.jpg" class="logo">
     <el-form class="sub-form" label-position="left" label-width="0" :rules="rules" ref="ruleForm" :model="subForm">
       <el-form-item prop="account">
         <el-input placeholder="请输入账号" prefix-icon="el-icon-user" v-model="subForm.account"></el-input>
@@ -82,10 +83,15 @@ export default {
 .login {
   height: 100%;
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
   background: url("../../assets/bg.jpg") no-repeat center;
   background-size: 100%;
+  .logo {
+    width: 50px;
+    margin-bottom: 10px;
+  }
   .sub-form {
     width: 500px;
     .foot-btn {

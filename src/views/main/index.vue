@@ -1,7 +1,10 @@
 <template>
   <div>
     <el-container>
-      <el-header class="herder">Header</el-header>
+      <el-header class="herder">
+        <img src="../../assets/logo.jpg" class="logo">
+        <el-button type="text" @click="logout">退出登陆</el-button>
+      </el-header>
       <el-container class="main">
         <el-aside width="180px">
           <el-menu default-active="user" router class="el-menu-vertical-demo">
@@ -40,6 +43,12 @@ export default {
         }
       ]
     };
+  },
+  methods: {
+    logout() {
+      localStorage.removeItem("code");
+      this.$router.push({ path: "/login" });
+    }
   }
 };
 </script>
@@ -47,6 +56,12 @@ export default {
 .herder {
   background: #303133;
   color: #fff;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  .logo {
+    width: 40px;
+  }
 }
 .main {
   height: calc(100vh - 60px);
