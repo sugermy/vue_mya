@@ -1,5 +1,5 @@
 <template>
-  <div class="content">
+  <div class="content" v-loading.fullscreen.lock="loading">
     <header class="header">
       <!-- <h3>用户账户管理</h3> -->
       <el-form inline :model="searchForm">
@@ -30,10 +30,6 @@
       </el-table-column>
       <el-table-column prop="remark" label="备注说明">
       </el-table-column>
-      <el-table-column prop="time_create" label="创建日期" width="200">
-      </el-table-column>
-      <el-table-column prop="user_create" label="创建操作人" width="200">
-      </el-table-column>
       <el-table-column prop="time_update" label="更新日期" width="200">
       </el-table-column>
       <el-table-column prop="user_create" label="更新操作人" width="200">
@@ -46,7 +42,7 @@
           </el-switch>
         </template>
       </el-table-column>
-      <el-table-column label="操作" width="120">
+      <el-table-column label="操作" width="160">
         <template slot-scope="scope">
           <el-button type="text" @click="editAction(scope.row.id)">编辑</el-button>
           <el-button type="text" @click="pwdAction(scope.row.id)">修改密码</el-button>
@@ -116,6 +112,7 @@ export default {
   name: "user",
   data() {
     return {
+      loading: false,
       searchForm: {
         account: "",
         real_name: "",
@@ -175,8 +172,11 @@ export default {
   methods: {
     // 获取信息
     getlist() {
+      this.loading = true;
       this.$ajax.get("/api/user/", this.searchForm).then(res => {
+        this.loading = false;
         this.searchForm.total = res.rsp_data.total || 0;
+
         this.tableData = res.rsp_data.data_detail || [];
       });
     },
@@ -196,7 +196,9 @@ export default {
       this.editTxt = "编辑用户";
       this.showEdit = true;
       this.isNew = false;
+      this.loading = true;
       this.$ajax.get(`/api/user/${id}`).then(res => {
+        this.loading = false;
         if (res.rsp_code === 200) {
           this.form = res.rsp_data;
           this.form = {
@@ -214,12 +216,14 @@ export default {
     },
     // 更改单行状态
     changeSwich(row) {
+      this.loading = true;
       this.$ajax
         .patch("/api/user/", {
           update_type: row.is_enabled ? 1 : 2,
           id_list: row.id
         })
         .then(res => {
+          this.loading = false;
           if (res.rsp_code === 200) {
             this.$message({ type: "success", message: res.rsp_msg });
           } else {
@@ -232,15 +236,16 @@ export default {
       if (this.multipleSelection.length < 1) {
         this.$message({ type: "warning", message: "请选择需要操作的数据" });
       } else {
-        console.log(this.multipleSelection);
         let ids = this.multipleSelection
           .map(el => {
             return el.id;
           })
           .join("|");
+        this.loading = true;
         this.$ajax
           .patch("/api/user/", { update_type: 3, id_list: ids })
           .then(res => {
+            this.loading = false;
             if (res.rsp_code === 200) {
               this.$message({ type: "success", message: res.rsp_msg });
             } else {
@@ -280,7 +285,9 @@ export default {
     },
     // 新增提交方法
     newPost(formName) {
+      this.loading = true;
       this.$ajax.post("/api/user/", this.form).then(res => {
+        this.loading = false;
         if (res.rsp_code === 200) {
           this.$message({ type: "success", message: res.rsp_msg });
           this.$refs[formName].resetFields();
@@ -293,7 +300,9 @@ export default {
     },
     // 编辑提交方法
     editPost(formName) {
+      this.loading = true;
       this.$ajax.put(`/api/user/${this.form.id}`, this.form).then(res => {
+        this.loading = false;
         if (res.rsp_code === 200) {
           this.$message({ type: "success", message: res.rsp_msg });
           this.$refs[formName].resetFields();
@@ -308,9 +317,11 @@ export default {
     confrimPwdAction(formName) {
       this.$refs[formName].validate(valid => {
         if (valid) {
+          this.loading = true;
           this.$ajax
             .patch(`/api/user/${this.pwdForm.id}`, this.pwdForm)
             .then(res => {
+              this.loading = false;
               if (res.rsp_code === 200) {
                 this.$message({ type: "success", message: res.rsp_msg });
                 this.$refs[formName].resetFields();
