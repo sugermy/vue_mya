@@ -4,7 +4,7 @@ const ACTIVE_SERVER = 'official'//当前使用的服务器
 const ALL_SERVERS = {
     // 1-1. 正式服务器
     official: {
-        apiServer: 'http://serviceweb.hebitsoft.com/api',
+        apiServer: 'http://serviceweb.hebitsoft.com',
     },
     // 1-2. 测试服务器
     localhost: {

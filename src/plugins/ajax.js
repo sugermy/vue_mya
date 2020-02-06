@@ -10,7 +10,7 @@ export default class Ajax {
     constructor(Token = "", TIMEOUT = 60000) {
         // 创建一个新的axios实例，并设置默认请求地址和请求头
         this._axios = axios.create({
-            // baseURL,
+            baseURL,
             TIMEOUT,
             headers: { code: '' }
         });
