@@ -2,7 +2,7 @@
   <div>
     <el-container>
       <el-header class="herder">
-        <img src="../../assets/logo.jpg" class="logo">
+        <img src="../../assets/logo.png" class="logo">
         <el-button type="text" @click="logout">退出登陆</el-button>
       </el-header>
       <el-container class="main">

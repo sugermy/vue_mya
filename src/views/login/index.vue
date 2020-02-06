@@ -1,6 +1,6 @@
 <template>
   <div class="login" v-loading="loading">
-    <img src="../../assets/logo.jpg" class="logo">
+    <img src="../../assets/logo.png" class="logo">
     <el-form class="sub-form" label-position="left" label-width="0" :rules="rules" ref="ruleForm" :model="subForm">
       <el-form-item prop="account">
         <el-input placeholder="请输入账号" prefix-icon="el-icon-user" v-model="subForm.account"></el-input>

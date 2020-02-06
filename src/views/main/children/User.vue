@@ -57,22 +57,24 @@
       </el-pagination>
     </div>
     <!-- 编辑部分 -->
-    <el-dialog :title="editTxt" :visible.sync="showEdit">
+    <el-dialog :title="editTxt" :visible.sync="showEdit" :close-on-click-modal="false">
       <el-form :model="form" label-width="80px" ref="editForm" :rules="rules" hide-required-asterisk>
         <el-form-item label="帐号" prop="account">
-          <el-input v-model="form.account" autocomplete="off" :disabled="!isNew" placeholder="请输入帐号"></el-input>
+          <el-input v-model="form.account" autocomplete="off" maxlength="20" :disabled="!isNew" placeholder="请输入帐号">
+          </el-input>
         </el-form-item>
         <el-form-item label="密码" prop="pwd" v-if="isNew">
-          <el-input v-model="form.pwd" autocomplete="off" placeholder="请输入密码"></el-input>
+          <el-input v-model="form.pwd" autocomplete="off" maxlength="20" placeholder="请输入密码"></el-input>
         </el-form-item>
         <el-form-item label="真实姓名" prop="real_name">
-          <el-input v-model="form.real_name" autocomplete="off" placeholder="请输入真实姓名"></el-input>
+          <el-input v-model="form.real_name" autocomplete="off" maxlength="20" placeholder="请输入真实姓名"></el-input>
         </el-form-item>
         <el-form-item label="手机" prop="mobile">
-          <el-input v-model="form.mobile" autocomplete="off" placeholder="请输入用户手机号码"></el-input>
+          <el-input v-model="form.mobile" autocomplete="off" maxlength="20" placeholder="请输入用户手机号码"></el-input>
         </el-form-item>
         <el-form-item label="备注">
-          <el-input type="textarea" autocomplete="off" :rows="2" placeholder="请输入说明内容" v-model="form.remark">
+          <el-input type="textarea" autocomplete="off" :rows="2" maxlength="100" placeholder="请输入说明内容"
+            v-model="form.remark">
           </el-input>
         </el-form-item>
         <el-form-item label="是否启用">
@@ -85,6 +87,22 @@
       <div slot="footer" class="dialog-footer">
         <el-button @click="cancalAction('editForm')">取 消</el-button>
         <el-button type="primary" @click="confrimAction('editForm')">确 定</el-button>
+      </div>
+    </el-dialog>
+
+    <!-- 密码编辑部分 -->
+    <el-dialog title="修改密码" :visible.sync="showPwd" :close-on-click-modal="false" width="500px">
+      <el-form :model="pwdForm" label-width="80px" ref="pwdForm" :rules="rules" hide-required-asterisk>
+        <el-form-item label="原密码" prop="pwd_old">
+          <el-input v-model="pwdForm.pwd_old" autocomplete="off" placeholder="请输入原密码"></el-input>
+        </el-form-item>
+        <el-form-item label="新密码" prop="pwd_new">
+          <el-input v-model="pwdForm.pwd_new" autocomplete="off" placeholder="请输入新密码"></el-input>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="cancalPwdAction('pwdForm')">取 消</el-button>
+        <el-button type="primary" @click="confrimPwdAction('pwdForm')">确 定</el-button>
       </div>
     </el-dialog>
   </div>
@@ -108,6 +126,8 @@ export default {
       rules: {
         account: [{ required: true, message: "请输入帐号", trigger: "blur" }],
         pwd: [{ required: true, message: "请输入密码", trigger: "blur" }],
+        pwd_old: [{ required: true, message: "请输入原密码", trigger: "blur" }],
+        pwd_new: [{ required: true, message: "请输入新密码", trigger: "blur" }],
         real_name: [
           { required: true, message: "请输入真实姓名", trigger: "blur" }
         ],
@@ -130,7 +150,13 @@ export default {
         is_enabled: true
       },
       editTxt: "",
-      isNew: true
+      isNew: true,
+      showPwd: false,
+      pwdForm: {
+        id: "",
+        pwd_old: "",
+        pwd_new: ""
+      }
     };
   },
   created() {
@@ -144,17 +170,18 @@ export default {
         this.tableData = res.rsp_data.data_detail || [];
       });
     },
+    // 查询
     onSubmit() {
       this.searchForm.page = 1;
       this.getlist();
     },
-    // 新增
+    // 新增操作
     newAction() {
       this.editTxt = "新增用户";
       this.showEdit = true;
       this.isNew = true;
     },
-    // 操作
+    // 编辑操作---弹窗赋值
     editAction(id) {
       this.editTxt = "编辑用户";
       this.showEdit = true;
@@ -183,9 +210,12 @@ export default {
         console.log(this.multipleSelection);
       }
     },
-    // 修改密码
-    pwdAction(id) {},
-    // 取消提交
+    // 修改密码--弹窗
+    pwdAction(id) {
+      this.showPwd = true;
+      this.pwdForm.id = id;
+    },
+    // 取消提交---重置参数
     cancalAction(formName) {
       this.$refs[formName].resetFields();
       this.showEdit = false;
@@ -194,9 +224,9 @@ export default {
       });
       this.form.is_enabled = true;
     },
-    // 确认提交
+
+    // 确认提交操作执行
     confrimAction(formName) {
-      console.log(this.form);
       this.$refs[formName].validate(valid => {
         if (valid) {
           if (this.form.id !== "") {
@@ -209,7 +239,7 @@ export default {
         }
       });
     },
-    // 新增提交
+    // 新增提交方法
     newPost(formName) {
       this.$ajax.post("/api/user/", this.form).then(res => {
         if (res.rsp_code === 200) {
@@ -222,7 +252,7 @@ export default {
         }
       });
     },
-    // 编辑提交
+    // 编辑提交方法
     editPost(formName) {
       this.$ajax.put(`/api/user/${this.form.id}`, this.form).then(res => {
         if (res.rsp_code === 200) {
@@ -234,6 +264,32 @@ export default {
           this.$message({ type: "error", message: res.rsp_msg });
         }
       });
+    },
+    // 提交修改密码
+    confrimPwdAction(formName) {
+      this.$refs[formName].validate(valid => {
+        if (valid) {
+          this.$ajax
+            .patch(`/api/user/${this.pwdForm.id}`, this.pwdForm)
+            .then(res => {
+              if (res.rsp_code === 200) {
+                this.$message({ type: "success", message: res.rsp_msg });
+                this.$refs[formName].resetFields();
+                this.showPwd = false;
+                this.getlist();
+              } else {
+                this.$message({ type: "error", message: res.rsp_msg });
+              }
+            });
+        } else {
+          return false;
+        }
+      });
+    },
+    // 取消修改密码
+    cancalPwdAction(formName) {
+      this.$refs[formName].resetFields();
+      this.showPwd = false;
     },
     // 页码大小
     sizeChange(val) {
