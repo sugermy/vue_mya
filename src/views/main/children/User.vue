@@ -40,7 +40,10 @@
       </el-table-column>
       <el-table-column prop="is_enabled" label="是否启用" width="120">
         <template slot-scope="scope">
-          <span>{{scope.row.is_enabled?'启用':'禁用'}}</span>
+          <!-- <span>{{scope.row.is_enabled?'启用':'禁用'}}</span> -->
+          <el-switch v-model="scope.row.is_enabled" active-color="#13ce66" inactive-color="#ff4949"
+            @change="changeSwich(scope.row)">
+          </el-switch>
         </template>
       </el-table-column>
       <el-table-column label="操作" width="120">
@@ -124,7 +127,14 @@ export default {
       multipleSelection: [],
       showEdit: false,
       rules: {
-        account: [{ required: true, message: "请输入帐号", trigger: "blur" }],
+        account: [
+          { required: true, message: "请输入帐号", trigger: "blur" },
+          {
+            pattern: /^[a-zA-Z][a-zA-Z0-9_]*$/,
+            message: "帐号格式不正确",
+            trigger: "blur"
+          }
+        ],
         pwd: [{ required: true, message: "请输入密码", trigger: "blur" }],
         pwd_old: [{ required: true, message: "请输入原密码", trigger: "blur" }],
         pwd_new: [{ required: true, message: "请输入新密码", trigger: "blur" }],
@@ -202,12 +212,41 @@ export default {
         }
       });
     },
+    // 更改单行状态
+    changeSwich(row) {
+      this.$ajax
+        .patch("/api/user/", {
+          update_type: row.is_enabled ? 1 : 2,
+          id_list: row.id
+        })
+        .then(res => {
+          if (res.rsp_code === 200) {
+            this.$message({ type: "success", message: res.rsp_msg });
+          } else {
+            this.$message({ type: "error", message: res.rsp_msg });
+          }
+        });
+    },
     // 删除
     delAction() {
       if (this.multipleSelection.length < 1) {
         this.$message({ type: "warning", message: "请选择需要操作的数据" });
       } else {
         console.log(this.multipleSelection);
+        let ids = this.multipleSelection
+          .map(el => {
+            return el.id;
+          })
+          .join("|");
+        this.$ajax
+          .patch("/api/user/", { update_type: 3, id_list: ids })
+          .then(res => {
+            if (res.rsp_code === 200) {
+              this.$message({ type: "success", message: res.rsp_msg });
+            } else {
+              this.$message({ type: "error", message: res.rsp_msg });
+            }
+          });
       }
     },
     // 修改密码--弹窗
@@ -321,6 +360,7 @@ export default {
 }
 .el-table {
   height: calc(100% - 160px);
+  overflow-y: auto;
 }
 .el-pagination {
   margin-top: 10px;

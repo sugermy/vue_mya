@@ -10,7 +10,7 @@
           v-model="subForm.password" show-password></el-input>
       </el-form-item>
       <div class="foot-btn">
-        <el-button type="primary" style="width:100%" @click="submitForm('ruleForm')">登陆</el-button>
+        <el-button type="primary" style="width:100%" @click="submitForm('ruleForm')">登录</el-button>
       </div>
     </el-form>
   </div>
@@ -93,7 +93,7 @@ export default {
     margin-bottom: 10px;
   }
   .sub-form {
-    width: 500px;
+    width: 300px;
     .foot-btn {
       text-align: center;
     }

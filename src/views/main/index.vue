@@ -2,8 +2,11 @@
   <div>
     <el-container>
       <el-header class="herder">
-        <img src="../../assets/logo.png" class="logo">
-        <el-button type="text" @click="logout">退出登陆</el-button>
+        <div>
+          <img src="../../assets/logo.png" class="logo">
+          <i>贺米粒值得您信任的品牌</i>
+        </div>
+        <el-button type="text" @click="logout">退出登录</el-button>
       </el-header>
       <el-container class="main">
         <el-aside width="180px">
