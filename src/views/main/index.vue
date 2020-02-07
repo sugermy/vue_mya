@@ -2,7 +2,7 @@
   <div>
     <el-container>
       <el-header class="herder">
-        <div>
+        <div class="header-left">
           <img src="../../assets/logo.png" class="logo">
           <i>贺米粒值得您信任的品牌</i>
         </div>
@@ -62,6 +62,10 @@ export default {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  .header-left {
+    display: flex;
+    align-items: center;
+  }
   .logo {
     width: 40px;
   }
