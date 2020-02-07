@@ -51,6 +51,7 @@
       <el-table-column label="操作" width="160">
         <template slot-scope="scope">
           <el-button type="text" @click="editAction(scope.row.merchant_code)">编辑</el-button>
+          <el-button type="text" @click="keyAction(scope.row)">查看密钥</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -97,6 +98,20 @@
         <el-button type="primary" @click="confrimAction('editForm')">确 定</el-button>
       </div>
     </el-dialog>
+    <!-- 密码编辑部分 -->
+    <el-dialog title="当前密钥" :visible.sync="showKey" :close-on-click-modal="false" width="500px">
+      <el-form :model="keyForm" ref="keyForm" hide-required-asterisk>
+        <el-form-item label="" prop="secret_key">
+          <el-input v-model="keyForm.secret_key" autocomplete="off" readonly>
+            <el-button slot="append" type="primary" @click="reloadKey">密钥变更</el-button>
+          </el-input>
+        </el-form-item>
+      </el-form>
+      <!-- <div slot="footer" class="dialog-footer">
+        <el-button @click="showKey=false">取 消</el-button>
+        <el-button type="primary" @click="confrimKeyAction('keyForm')">提 交</el-button>
+      </div> -->
+    </el-dialog>
   </div>
 </template>
 
@@ -140,11 +155,17 @@ export default {
         merchant_name: "",
         link_person: "",
         link_phone: "",
+        address: "",
         remark: "",
         is_enabled: true
       },
       editTxt: "",
-      isNew: true
+      isNew: true,
+      showKey: false,
+      keyForm: {
+        merchant_code: "",
+        secret_key: ""
+      }
     };
   },
   created() {
@@ -176,7 +197,7 @@ export default {
     // 新增获取商户号
     getCode() {
       this.loading = true;
-      this.$ajax.get("/api/merchant/option/1", this.searchForm).then(res => {
+      this.$ajax.get("/api/merchant/option/1").then(res => {
         this.loading = false;
         this.form.merchant_code = res.rsp_data;
       });
@@ -184,6 +205,30 @@ export default {
     // 重新获取商户号
     reloadCode() {
       this.getCode();
+    },
+
+    // 查看密钥
+    keyAction(row) {
+      this.keyForm.secret_key = row.secret_key;
+      this.keyForm.merchant_code = row.merchant_code;
+      this.showKey = true;
+    },
+    // 重新获取密钥
+    reloadKey() {
+      this.loading = true;
+      this.$ajax
+        .post("/api/merchant/option/2", {
+          merchant_code: this.keyForm.merchant_code
+        })
+        .then(res => {
+          this.loading = false;
+          if (res.rsp_code === 200) {
+            this.$message({ type: "success", message: res.rsp_msg });
+            this.keyForm.secret_key = res.rsp_data;
+          } else {
+            this.$message({ type: "error", message: res.rsp_msg });
+          }
+        });
     },
     // 编辑操作---弹窗赋值
     editAction(merchant_code) {
@@ -200,6 +245,7 @@ export default {
             merchant_name: res.rsp_data.merchant_name,
             link_person: res.rsp_data.link_person,
             link_phone: res.rsp_data.link_phone,
+            address: res.rsp_data.address,
             remark: res.rsp_data.remark,
             is_enabled: res.rsp_data.is_enabled
           };
