@@ -225,6 +225,7 @@ export default {
           if (res.rsp_code === 200) {
             this.$message({ type: "success", message: res.rsp_msg });
             this.keyForm.secret_key = res.rsp_data;
+            this.getlist();
           } else {
             this.$message({ type: "error", message: res.rsp_msg });
           }
