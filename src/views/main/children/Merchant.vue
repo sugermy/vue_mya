@@ -100,7 +100,7 @@
 
 <script>
 export default {
-  name: "user",
+  name: "merchant",
   data() {
     return {
       loading: false,
