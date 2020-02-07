@@ -33,6 +33,8 @@
       </el-table-column>
       <el-table-column prop="link_phone" label="联系电话" width="160">
       </el-table-column>
+      <el-table-column prop="address" label="地址">
+      </el-table-column>
       <el-table-column prop="remark" label="备注说明">
       </el-table-column>
       <el-table-column prop="time_update" label="更新日期" width="200">
@@ -239,6 +241,7 @@ export default {
           .then(res => {
             this.loading = false;
             if (res.rsp_code === 200) {
+              this.getlist();
               this.$message({ type: "success", message: res.rsp_msg });
             } else {
               this.$message({ type: "error", message: res.rsp_msg });
