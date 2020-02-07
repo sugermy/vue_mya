@@ -41,35 +41,40 @@ export default {
           let codekey = randomName();
           this.$ajax._axios.defaults.headers.code = codekey;
           this.loading = true;
-          this.$ajax.post("/api/user/login", this.subForm).then(res => {
-            this.loading = false;
-            if (res.rsp_code === 200) {
-              // 重置ajax的header.code
-              let curtime = new Date().getTime();
-              localStorage.setItem(
-                "code",
-                JSON.stringify({
-                  key: codekey,
-                  value: res.token,
-                  timer: curtime
-                })
-              );
-              // this.$ajax._axios.defaults.headers.code = res.token;
-              this.$message({
-                message: "登陆成功",
-                type: "success"
-              });
+          this.$ajax
+            .post("/api/user/login", this.subForm)
+            .then(res => {
               this.loading = false;
-              this.$router.push({
-                path: "/main"
-              });
-            } else {
-              this.$message({
-                message: res.rsp_msg,
-                type: "error"
-              });
-            }
-          });
+              if (res.rsp_code === 200) {
+                // 重置ajax的header.code
+                let curtime = new Date().getTime();
+                localStorage.setItem(
+                  "code",
+                  JSON.stringify({
+                    key: codekey,
+                    value: res.token,
+                    timer: curtime
+                  })
+                );
+                // this.$ajax._axios.defaults.headers.code = res.token;
+                this.$message({
+                  message: "登陆成功",
+                  type: "success"
+                });
+                this.loading = false;
+                this.$router.push({
+                  path: "/main"
+                });
+              } else {
+                this.$message({
+                  message: res.rsp_msg,
+                  type: "error"
+                });
+              }
+            })
+            .catch(err => {
+              this.loading = false;
+            });
         } else {
           console.log("error submit!!");
           return false;

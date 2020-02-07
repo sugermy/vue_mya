@@ -173,12 +173,16 @@ export default {
     // 获取信息
     getlist() {
       this.loading = true;
-      this.$ajax.get("/api/user/", this.searchForm).then(res => {
-        this.loading = false;
-        this.searchForm.total = res.rsp_data.total || 0;
-
-        this.tableData = res.rsp_data.data_detail || [];
-      });
+      this.$ajax
+        .get("/api/user/", this.searchForm)
+        .then(res => {
+          this.loading = false;
+          this.searchForm.total = res.rsp_data.total || 0;
+          this.tableData = res.rsp_data.data_detail || [];
+        })
+        .catch(err => {
+          this.loading = false;
+        });
     },
     // 查询
     onSubmit() {
@@ -197,22 +201,27 @@ export default {
       this.showEdit = true;
       this.isNew = false;
       this.loading = true;
-      this.$ajax.get(`/api/user/${id}`).then(res => {
-        this.loading = false;
-        if (res.rsp_code === 200) {
-          this.form = res.rsp_data;
-          this.form = {
-            id: res.rsp_data.id,
-            account: res.rsp_data.account,
-            real_name: res.rsp_data.real_name,
-            mobile: res.rsp_data.mobile,
-            remark: res.rsp_data.remark,
-            is_enabled: res.rsp_data.is_enabled
-          };
-        } else {
-          this.$message({ type: "error", message: res.rsp_msg });
-        }
-      });
+      this.$ajax
+        .get(`/api/user/${id}`)
+        .then(res => {
+          this.loading = false;
+          if (res.rsp_code === 200) {
+            this.form = res.rsp_data;
+            this.form = {
+              id: res.rsp_data.id,
+              account: res.rsp_data.account,
+              real_name: res.rsp_data.real_name,
+              mobile: res.rsp_data.mobile,
+              remark: res.rsp_data.remark,
+              is_enabled: res.rsp_data.is_enabled
+            };
+          } else {
+            this.$message({ type: "error", message: res.rsp_msg });
+          }
+        })
+        .catch(err => {
+          this.loading = false;
+        });
     },
     // 更改单行状态
     changeSwich(row) {
@@ -251,6 +260,9 @@ export default {
             } else {
               this.$message({ type: "error", message: res.rsp_msg });
             }
+          })
+          .catch(err => {
+            this.loading = false;
           });
       }
     },
@@ -286,32 +298,42 @@ export default {
     // 新增提交方法
     newPost(formName) {
       this.loading = true;
-      this.$ajax.post("/api/user/", this.form).then(res => {
-        this.loading = false;
-        if (res.rsp_code === 200) {
-          this.$message({ type: "success", message: res.rsp_msg });
-          this.$refs[formName].resetFields();
-          this.showEdit = false;
-          this.getlist();
-        } else {
-          this.$message({ type: "error", message: res.rsp_msg });
-        }
-      });
+      this.$ajax
+        .post("/api/user/", this.form)
+        .then(res => {
+          this.loading = false;
+          if (res.rsp_code === 200) {
+            this.$message({ type: "success", message: res.rsp_msg });
+            this.$refs[formName].resetFields();
+            this.showEdit = false;
+            this.getlist();
+          } else {
+            this.$message({ type: "error", message: res.rsp_msg });
+          }
+        })
+        .catch(err => {
+          this.loading = false;
+        });
     },
     // 编辑提交方法
     editPost(formName) {
       this.loading = true;
-      this.$ajax.put(`/api/user/${this.form.id}`, this.form).then(res => {
-        this.loading = false;
-        if (res.rsp_code === 200) {
-          this.$message({ type: "success", message: res.rsp_msg });
-          this.$refs[formName].resetFields();
-          this.showEdit = false;
-          this.getlist();
-        } else {
-          this.$message({ type: "error", message: res.rsp_msg });
-        }
-      });
+      this.$ajax
+        .put(`/api/user/${this.form.id}`, this.form)
+        .then(res => {
+          this.loading = false;
+          if (res.rsp_code === 200) {
+            this.$message({ type: "success", message: res.rsp_msg });
+            this.$refs[formName].resetFields();
+            this.showEdit = false;
+            this.getlist();
+          } else {
+            this.$message({ type: "error", message: res.rsp_msg });
+          }
+        })
+        .catch(err => {
+          this.loading = false;
+        });
     },
     // 提交修改密码
     confrimPwdAction(formName) {
@@ -330,6 +352,9 @@ export default {
               } else {
                 this.$message({ type: "error", message: res.rsp_msg });
               }
+            })
+            .catch(err => {
+              this.loading = false;
             });
         } else {
           return false;

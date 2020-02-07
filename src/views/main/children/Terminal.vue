@@ -24,9 +24,9 @@
       </el-table-column>
       <el-table-column prop="merchant_code" label="商户号" width="120">
       </el-table-column>
-      <el-table-column prop="merchant_name" label="商户名称" width="120">
+      <el-table-column prop="merchant_name" label="商户名称" width="160">
       </el-table-column>
-      <el-table-column prop="terminal_code" label="终端号" width="120">
+      <el-table-column prop="terminal_code" label="终端号" width="160">
       </el-table-column>
       <el-table-column prop="cache_time" label="缓存时间" width="160">
       </el-table-column>
@@ -142,11 +142,16 @@ export default {
     // 获取信息
     getlist() {
       this.loading = true;
-      this.$ajax.get("/api/terminal/", this.searchForm).then(res => {
-        this.loading = false;
-        this.searchForm.total = res.rsp_data.total || 0;
-        this.tableData = res.rsp_data.data_detail || [];
-      });
+      this.$ajax
+        .get("/api/terminal/", this.searchForm)
+        .then(res => {
+          this.loading = false;
+          this.searchForm.total = res.rsp_data.total || 0;
+          this.tableData = res.rsp_data.data_detail || [];
+        })
+        .catch(err => {
+          this.loading = false;
+        });
     },
     // 查询
     onSubmit() {
@@ -165,18 +170,28 @@ export default {
     // 新增获取终端号
     getCode() {
       this.loading = true;
-      this.$ajax.get("/api/terminal/option/1").then(res => {
-        this.loading = false;
-        this.form.terminal_code = res.rsp_data;
-      });
+      this.$ajax
+        .get("/api/terminal/option/1")
+        .then(res => {
+          this.loading = false;
+          this.form.terminal_code = res.rsp_data;
+        })
+        .catch(err => {
+          this.loading = false;
+        });
     },
     // 新增获取商户下拉
     getMerlist() {
       this.loading = true;
-      this.$ajax.get("/api/terminal/option/2").then(res => {
-        this.loading = false;
-        this.merlist = res.rsp_data || [];
-      });
+      this.$ajax
+        .get("/api/terminal/option/2")
+        .then(res => {
+          this.loading = false;
+          this.merlist = res.rsp_data || [];
+        })
+        .catch(err => {
+          this.loading = false;
+        });
     },
     // 重新获取终端号
     reloadCode() {
@@ -188,21 +203,26 @@ export default {
       this.showEdit = true;
       this.isNew = false;
       this.loading = true;
-      this.$ajax.get(`/api/terminal/${terminal_code}`).then(res => {
-        this.loading = false;
-        if (res.rsp_code === 200) {
-          this.form = {
-            type: 2,
-            merchant_code: res.rsp_data.merchant_code,
-            terminal_code: res.rsp_data.terminal_code,
-            cache_time: Number(res.rsp_data.cache_time),
-            remark: res.rsp_data.remark,
-            is_enabled: res.rsp_data.is_enabled
-          };
-        } else {
-          this.$message({ type: "error", message: res.rsp_msg });
-        }
-      });
+      this.$ajax
+        .get(`/api/terminal/${terminal_code}`)
+        .then(res => {
+          this.loading = false;
+          if (res.rsp_code === 200) {
+            this.form = {
+              type: 2,
+              merchant_code: res.rsp_data.merchant_code,
+              terminal_code: res.rsp_data.terminal_code,
+              cache_time: Number(res.rsp_data.cache_time),
+              remark: res.rsp_data.remark,
+              is_enabled: res.rsp_data.is_enabled
+            };
+          } else {
+            this.$message({ type: "error", message: res.rsp_msg });
+          }
+        })
+        .catch(err => {
+          this.loading = false;
+        });
     },
     // 更改单行状态
     changeSwich(row) {
@@ -220,6 +240,9 @@ export default {
           } else {
             this.$message({ type: "error", message: res.rsp_msg });
           }
+        })
+        .catch(err => {
+          this.loading = false;
         });
     },
     // 删除
@@ -243,6 +266,9 @@ export default {
             } else {
               this.$message({ type: "error", message: res.rsp_msg });
             }
+          })
+          .catch(err => {
+            this.loading = false;
           });
       }
     },
@@ -274,17 +300,22 @@ export default {
     // 新增提交方法
     newPost(formName) {
       this.loading = true;
-      this.$ajax.post("/api/terminal/", this.form).then(res => {
-        this.loading = false;
-        if (res.rsp_code === 200) {
-          this.$message({ type: "success", message: res.rsp_msg });
-          this.$refs[formName].resetFields();
-          this.showEdit = false;
-          this.getlist();
-        } else {
-          this.$message({ type: "error", message: res.rsp_msg });
-        }
-      });
+      this.$ajax
+        .post("/api/terminal/", this.form)
+        .then(res => {
+          this.loading = false;
+          if (res.rsp_code === 200) {
+            this.$message({ type: "success", message: res.rsp_msg });
+            this.$refs[formName].resetFields();
+            this.showEdit = false;
+            this.getlist();
+          } else {
+            this.$message({ type: "error", message: res.rsp_msg });
+          }
+        })
+        .catch(err => {
+          this.loading = false;
+        });
     },
     // 编辑提交方法
     editPost(formName) {
@@ -301,6 +332,9 @@ export default {
           } else {
             this.$message({ type: "error", message: res.rsp_msg });
           }
+        })
+        .catch(err => {
+          this.loading = false;
         });
     },
     // 页码大小
