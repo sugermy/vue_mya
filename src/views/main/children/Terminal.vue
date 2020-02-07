@@ -45,7 +45,7 @@
       </el-table-column>
       <el-table-column label="操作" width="100">
         <template slot-scope="scope">
-          <el-button type="text" @click="editAction(scope.row.termianl_code)">编辑</el-button>
+          <el-button type="text" @click="editAction(scope.row.terminal_code)">编辑</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -64,13 +64,13 @@
               :key="index"></el-option>
           </el-select>
         </el-form-item>
-        <el-form-item label="终端号" prop="termianl_code">
-          <el-input v-model="form.termianl_code" autocomplete="off" readonly>
+        <el-form-item label="终端号" prop="terminal_code">
+          <el-input v-model="form.terminal_code" autocomplete="off" readonly>
             <el-button slot="append" type="primary" v-if="isNew" @click="reloadCode">重新获取</el-button>
           </el-input>
         </el-form-item>
         <el-form-item label="缓存时间" prop="cache_time">
-          <el-input v-model.number="form.cache_time" autocomplete="off" maxlength="20" placeholder="请选择商户"></el-input>
+          <el-input v-model.number="form.cache_time" autocomplete="off" maxlength="20" placeholder="请输入缓存时间"></el-input>
         </el-form-item>
         <el-form-item label="备注">
           <el-input type="textarea" autocomplete="off" :rows="2" maxlength="100" placeholder="请输入说明内容"
@@ -114,12 +114,18 @@ export default {
         ],
         cache_time: [
           { required: true, message: "请输入缓存时间" },
+          {
+            pattern: /(^[1-6][0-9]{0,1}$)|(^[7][0-2]{0,1}$)/,
+            message: "缓存时间值1-72之间",
+            trigger: "blur"
+          },
           { type: "number", message: "缓存时间必须为数字值" }
         ]
       },
       form: {
+        type: 1,
         merchant_code: "",
-        termianl_code: "",
+        terminal_code: "",
         cache_time: "",
         remark: "",
         is_enabled: true
@@ -152,6 +158,7 @@ export default {
       this.editTxt = "新增终端";
       this.showEdit = true;
       this.isNew = true;
+      this.form.type = 1;
       this.getMerlist();
       this.getCode();
     },
@@ -160,7 +167,7 @@ export default {
       this.loading = true;
       this.$ajax.get("/api/terminal/option/1").then(res => {
         this.loading = false;
-        this.form.termianl_code = res.rsp_data;
+        this.form.terminal_code = res.rsp_data;
       });
     },
     // 新增获取商户下拉
@@ -176,18 +183,19 @@ export default {
       this.getCode();
     },
     // 编辑操作---弹窗赋值
-    editAction(termianl_code) {
+    editAction(terminal_code) {
       this.editTxt = "编辑终端";
       this.showEdit = true;
       this.isNew = false;
       this.loading = true;
-      this.$ajax.get(`/api/terminal/${termianl_code}`).then(res => {
+      this.$ajax.get(`/api/terminal/${terminal_code}`).then(res => {
         this.loading = false;
         if (res.rsp_code === 200) {
           this.form = {
+            type: 2,
             merchant_code: res.rsp_data.merchant_code,
-            termianl_code: res.rsp_data.termianl_code,
-            cache_time: res.rsp_data.cache_time,
+            terminal_code: res.rsp_data.terminal_code,
+            cache_time: Number(res.rsp_data.cache_time),
             remark: res.rsp_data.remark,
             is_enabled: res.rsp_data.is_enabled
           };
@@ -208,6 +216,7 @@ export default {
           this.loading = false;
           if (res.rsp_code === 200) {
             this.$message({ type: "success", message: res.rsp_msg });
+            this.getlist();
           } else {
             this.$message({ type: "error", message: res.rsp_msg });
           }
@@ -245,6 +254,7 @@ export default {
         this.form[el] = "";
       });
       this.form.is_enabled = true;
+      this.form.type = 1;
     },
 
     // 确认提交操作执行
