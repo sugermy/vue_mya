@@ -65,7 +65,7 @@
       <el-form :model="form" label-width="80px" ref="editForm" :rules="rules" hide-required-asterisk>
         <el-form-item label="商户号" prop="merchant_code">
           <el-input v-model="form.merchant_code" autocomplete="off" readonly>
-            <el-button slot="append" type="primary" v-if="!isNew" @click="reloadCode">重新获取</el-button>
+            <el-button slot="append" type="primary" v-if="isNew" @click="reloadCode">重新获取</el-button>
           </el-input>
         </el-form-item>
         <el-form-item label="商户名称" prop="merchant_name">
