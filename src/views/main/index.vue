@@ -10,7 +10,7 @@
       </el-header>
       <el-container class="main">
         <el-aside width="180px">
-          <el-menu default-active="user" router class="el-menu-vertical-demo">
+          <el-menu :default-active="defaultRouer" router class="el-menu-vertical-demo">
             <el-menu-item :index="item.path" v-for="(item,index) in menus" :key="index">
               <i :class="item.icon"></i>
               <span slot="title">{{item.name}}</span>
@@ -44,8 +44,12 @@ export default {
           path: "terminal",
           icon: "el-icon-monitor"
         }
-      ]
+      ],
+      defaultRouer: "user"
     };
+  },
+  created() {
+    this.defaultRouer = this.$route.name;
   },
   methods: {
     logout() {

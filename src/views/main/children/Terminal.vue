@@ -26,17 +26,15 @@
       </el-table-column>
       <el-table-column prop="merchant_name" label="商户名称" width="120">
       </el-table-column>
-      <el-table-column prop="link_person" label="联系人" width="120">
+      <el-table-column prop="terminal_code" label="终端号" width="120">
       </el-table-column>
-      <el-table-column prop="link_phone" label="联系电话" width="160">
-      </el-table-column>
-      <el-table-column prop="address" label="地址">
+      <el-table-column prop="cache_time" label="缓存时间" width="160">
       </el-table-column>
       <el-table-column prop="remark" label="备注说明">
       </el-table-column>
       <el-table-column prop="time_update" label="更新日期" width="200">
       </el-table-column>
-      <el-table-column prop="user_create" label="更新操作人" width="200">
+      <el-table-column prop="user_update" label="更新操作人" width="200">
       </el-table-column>
       <el-table-column prop="is_enabled" label="是否启用" width="120">
         <template slot-scope="scope">
@@ -45,10 +43,9 @@
           </el-switch>
         </template>
       </el-table-column>
-      <el-table-column label="操作" width="160">
+      <el-table-column label="操作" width="100">
         <template slot-scope="scope">
-          <el-button type="text" @click="editAction(scope.row.merchant_code)">编辑</el-button>
-          <el-button type="text" @click="keyAction(scope.row)">查看密钥</el-button>
+          <el-button type="text" @click="editAction(scope.row.termianl_code)">编辑</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -63,7 +60,8 @@
       <el-form :model="form" label-width="80px" ref="editForm" :rules="rules" hide-required-asterisk>
         <el-form-item label="商户号" prop="merchant_code">
           <el-select v-model="form.merchant_code" placeholder="请选择商户" style="width:100%">
-            <el-option label="区域一" value="shanghai" v-for="(item,index) in merlist" :key="index"></el-option>
+            <el-option :label="item.merchant_name" :value="item.merchant_code" v-for="(item,index) in merlist"
+              :key="index"></el-option>
           </el-select>
         </el-form-item>
         <el-form-item label="终端号" prop="termianl_code">
@@ -72,7 +70,7 @@
           </el-input>
         </el-form-item>
         <el-form-item label="缓存时间" prop="cache_time">
-          <el-input v-model="form.cache_time" autocomplete="off" maxlength="20" placeholder="请选择商户"></el-input>
+          <el-input v-model.number="form.cache_time" autocomplete="off" maxlength="20" placeholder="请选择商户"></el-input>
         </el-form-item>
         <el-form-item label="备注">
           <el-input type="textarea" autocomplete="off" :rows="2" maxlength="100" placeholder="请输入说明内容"
@@ -170,7 +168,7 @@ export default {
       this.loading = true;
       this.$ajax.get("/api/terminal/option/2").then(res => {
         this.loading = false;
-        this.form.merlist = res.rsp_data || [];
+        this.merlist = res.rsp_data || [];
       });
     },
     // 重新获取终端号
@@ -178,12 +176,12 @@ export default {
       this.getCode();
     },
     // 编辑操作---弹窗赋值
-    editAction(merchant_code) {
+    editAction(termianl_code) {
       this.editTxt = "编辑终端";
       this.showEdit = true;
       this.isNew = false;
       this.loading = true;
-      this.$ajax.get(`/api/terminal/${merchant_code}`).then(res => {
+      this.$ajax.get(`/api/terminal/${termianl_code}`).then(res => {
         this.loading = false;
         if (res.rsp_code === 200) {
           this.form = {
