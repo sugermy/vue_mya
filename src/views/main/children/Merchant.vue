@@ -86,16 +86,16 @@
         <el-form-item label="有效日期">
           <el-col :span="11">
             <el-form-item prop="valid_st">
-              <el-date-picker type="date" placeholder="请选择生效日期" format="yyyy-MM-dd" v-model="form.valid_st"
-                value-format="yyyy-MM-dd" style="width: 100%;">
+              <el-date-picker type="date" placeholder="请选择生效日期" :readonly="!isNew" format="yyyy-MM-dd"
+                v-model="form.valid_st" value-format="yyyy-MM-dd" style="width: 100%;">
               </el-date-picker>
             </el-form-item>
           </el-col>
           <el-col style="text-align:center" :span="2">-</el-col>
           <el-col :span="11">
             <el-form-item prop="valid_et">
-              <el-date-picker type="date" placeholder="请选择失效日期" format="yyyy-MM-dd" v-model="form.valid_et"
-                value-format="yyyy-MM-dd" style="width: 100%;">
+              <el-date-picker type="date" placeholder="请选择失效日期" :readonly="!isNew" format="yyyy-MM-dd"
+                v-model="form.valid_et" value-format="yyyy-MM-dd" style="width: 100%;">
               </el-date-picker>
             </el-form-item>
           </el-col>
@@ -342,6 +342,8 @@ export default {
               link_phone: res.rsp_data.link_phone,
               address: res.rsp_data.address,
               remark: res.rsp_data.remark,
+              valid_st: res.rsp_data.valid_st,
+              valid_et: res.rsp_data.valid_et,
               is_enabled: res.rsp_data.is_enabled
             };
           } else {
