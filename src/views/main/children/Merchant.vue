@@ -81,6 +81,23 @@
         <el-form-item label="地址" prop="address">
           <el-input v-model="form.address" autocomplete="off" maxlength="100" placeholder="请输入联系地址"></el-input>
         </el-form-item>
+        <el-form-item label="有效日期">
+          <el-col :span="11">
+            <el-form-item prop="valid_st">
+              <el-date-picker type="date" placeholder="请选择生效日期" format="yyyy-MM-dd" v-model="form.valid_st"
+                value-format="yyyy-MM-dd" style="width: 100%;">
+              </el-date-picker>
+            </el-form-item>
+          </el-col>
+          <el-col style="text-align:center" :span="2">-</el-col>
+          <el-col :span="11">
+            <el-form-item prop="valid_et">
+              <el-date-picker type="date" placeholder="请选择失效日期" format="yyyy-MM-dd" v-model="form.valid_et"
+                value-format="yyyy-MM-dd" style="width: 100%;">
+              </el-date-picker>
+            </el-form-item>
+          </el-col>
+        </el-form-item>
         <el-form-item label="备注">
           <el-input type="textarea" autocomplete="off" :rows="2" maxlength="100" placeholder="请输入说明内容"
             v-model="form.remark">
@@ -147,7 +164,21 @@ export default {
             trigger: "blur"
           }
         ],
-        address: [{ required: true, message: "请输入地址", trigger: "blur" }]
+        address: [{ required: true, message: "请输入地址", trigger: "blur" }],
+        valid_st: [
+          {
+            required: true,
+            message: "请选择生效日期",
+            trigger: "change"
+          }
+        ],
+        valid_et: [
+          {
+            required: true,
+            message: "请选择失效日期",
+            trigger: "change"
+          }
+        ]
       },
       form: {
         type: 1,
@@ -157,6 +188,8 @@ export default {
         link_phone: "",
         address: "",
         remark: "",
+        valid_st: "",
+        valid_et: "",
         is_enabled: true
       },
       editTxt: "",
