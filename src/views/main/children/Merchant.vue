@@ -27,19 +27,21 @@
       </el-table-column>
       <el-table-column prop="merchant_code" label="商户号" width="120">
       </el-table-column>
-      <el-table-column prop="merchant_name" label="商户名称" width="120">
+      <el-table-column prop="merchant_name" label="商户名称" width="160">
       </el-table-column>
       <el-table-column prop="link_person" label="联系人" width="120">
       </el-table-column>
       <el-table-column prop="link_phone" label="联系电话" width="160">
       </el-table-column>
-      <el-table-column prop="address" label="地址">
-      </el-table-column>
+      <!-- <el-table-column prop="address" label="地址">
+      </el-table-column> -->
       <el-table-column prop="remark" label="备注说明">
+      </el-table-column>
+      <el-table-column prop="user_create" label="创建人" width="120">
       </el-table-column>
       <el-table-column prop="time_update" label="更新日期" width="200">
       </el-table-column>
-      <el-table-column prop="user_create" label="更新操作人" width="200">
+      <el-table-column prop="user_create" label="更新操作人" width="120">
       </el-table-column>
       <el-table-column prop="is_enabled" label="是否启用" width="120">
         <template slot-scope="scope">
@@ -51,7 +53,7 @@
       <el-table-column label="操作" width="160">
         <template slot-scope="scope">
           <el-button type="text" @click="editAction(scope.row.merchant_code)">编辑</el-button>
-          <el-button type="text" @click="keyAction(scope.row)">查看密钥</el-button>
+          <el-button type="text" @click="keyAction(scope.row)">有效信息</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -116,18 +118,35 @@
       </div>
     </el-dialog>
     <!-- 密码编辑部分 -->
-    <el-dialog title="当前密钥" :visible.sync="showKey" :close-on-click-modal="false" width="500px">
-      <el-form :model="keyForm" ref="keyForm" hide-required-asterisk>
-        <el-form-item label="" prop="secret_key">
+    <el-dialog title="有效信息" :visible.sync="showKey" :close-on-click-modal="false" width="500px">
+      <el-form :model="keyForm" label-width="80px" label-position="left" ref="keyForm" hide-required-asterisk>
+        <el-form-item label="秘钥" prop="secret_key">
           <el-input v-model="keyForm.secret_key" autocomplete="off" readonly>
             <el-button slot="append" type="primary" @click="reloadKey">密钥变更</el-button>
           </el-input>
         </el-form-item>
+        <el-form-item label="有效日期">
+          <el-col :span="11">
+            <el-form-item prop="valid_st">
+              <el-date-picker type="date" placeholder="请选择生效日期" format="yyyy-MM-dd" v-model="keyForm.valid_st"
+                value-format="yyyy-MM-dd" style="width: 100%;">
+              </el-date-picker>
+            </el-form-item>
+          </el-col>
+          <el-col style="text-align:center" :span="2">-</el-col>
+          <el-col :span="11">
+            <el-form-item prop="valid_et">
+              <el-date-picker type="date" placeholder="请选择失效日期" format="yyyy-MM-dd" v-model="keyForm.valid_et"
+                value-format="yyyy-MM-dd" style="width: 100%;">
+              </el-date-picker>
+            </el-form-item>
+          </el-col>
+        </el-form-item>
       </el-form>
-      <!-- <div slot="footer" class="dialog-footer">
+      <div slot="footer" class="dialog-footer">
         <el-button @click="showKey=false">取 消</el-button>
         <el-button type="primary" @click="confrimKeyAction('keyForm')">提 交</el-button>
-      </div> -->
+      </div>
     </el-dialog>
   </div>
 </template>
@@ -197,7 +216,9 @@ export default {
       showKey: false,
       keyForm: {
         merchant_code: "",
-        secret_key: ""
+        secret_key: "",
+        valid_st: "",
+        valid_et: ""
       }
     };
   },
@@ -253,6 +274,8 @@ export default {
     // 查看密钥
     keyAction(row) {
       this.keyForm.secret_key = row.secret_key;
+      this.keyForm.valid_st = row.valid_st;
+      this.keyForm.valid_et = row.valid_et;
       this.keyForm.merchant_code = row.merchant_code;
       this.showKey = true;
     },
@@ -268,6 +291,29 @@ export default {
           if (res.rsp_code === 200) {
             this.$message({ type: "success", message: res.rsp_msg });
             this.keyForm.secret_key = res.rsp_data;
+            this.getlist();
+          } else {
+            this.$message({ type: "error", message: res.rsp_msg });
+          }
+        })
+        .catch(err => {
+          this.loading = false;
+        });
+    },
+    // 确认信息修改提交
+    confrimKeyAction(formName) {
+      this.loading = true;
+      this.$ajax
+        .post("/api/merchant/option/3", {
+          merchant_code: this.keyForm.merchant_code,
+          valid_st: this.keyForm.valid_st,
+          valid_et: this.keyForm.valid_et
+        })
+        .then(res => {
+          this.loading = false;
+          if (res.rsp_code === 200) {
+            this.$message({ type: "success", message: res.rsp_msg });
+            this.showKey = false;
             this.getlist();
           } else {
             this.$message({ type: "error", message: res.rsp_msg });
